@@ -349,7 +349,10 @@ function renderReleases() {
     // Attach click events to Copy buttons
     releasesGrid.querySelectorAll('.copy-action-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
-            const releaseId = e.currentTarget.dataset.id;
+            const targetBtn = e.currentTarget;
+            if (targetBtn.classList.contains('success-state')) return;
+
+            const releaseId = targetBtn.dataset.id;
             const item = releases.find(r => r.id === releaseId);
             if (item) {
                 try {
@@ -357,11 +360,9 @@ function renderReleases() {
                     showToast('Release content copied!', 'success');
                     
                     // Button feedback
-                    const targetBtn = e.currentTarget;
                     const originalText = targetBtn.querySelector('span').textContent;
                     const originalIconHTML = targetBtn.querySelector('svg').outerHTML;
                     
-                    targetBtn.querySelector('span').textContent = 'Copied!';
                     targetBtn.innerHTML = `
                         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 6L9 17l-5-5"/>
@@ -376,6 +377,7 @@ function renderReleases() {
                     }, 2000);
                     
                 } catch (err) {
+                    console.error('Card copy failed:', err);
                     showToast('Failed to copy content.', 'error');
                 }
             }
@@ -491,6 +493,8 @@ function updateTweetLength() {
 
 // Copy Tweet contents to Clipboard
 async function copyTweetToClipboard() {
+    if (copyTweetBtn.classList.contains('success-state')) return;
+
     const text = tweetTextarea.value;
     try {
         await navigator.clipboard.writeText(text);
@@ -513,6 +517,7 @@ async function copyTweetToClipboard() {
         }, 2000);
         
     } catch (err) {
+        console.error('Tweet copy failed:', err);
         showToast('Failed to copy text.', 'error');
     }
 }

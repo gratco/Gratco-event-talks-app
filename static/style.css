@@ -1363,3 +1363,75 @@ textarea:focus:not(:focus-visible) {
     border-color: var(--color-primary);
     color: var(--color-primary);
 }
+
+/* Advanced Filters & Header Row Controls */
+.controls-top-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+@media (min-width: 860px) {
+    .controls-top-row {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .controls-top-row .search-container {
+        flex-grow: 1;
+        max-width: 50%;
+    }
+}
+
+.advanced-filters {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Custom styled select box dropdown */
+.select-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.select-container select {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 12px;
+    padding: 0.75rem 2.25rem 0.75rem 1rem;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    transition: border var(--transition-fast);
+}
+
+.select-container select:focus {
+    border-color: var(--color-primary);
+}
+
+/* Add arrow down indicator to select container */
+.select-container::after {
+    content: "";
+    position: absolute;
+    right: 1rem;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--text-muted);
+    border-bottom: 2px solid var(--text-muted);
+    transform: rotate(45deg);
+    pointer-events: none;
+}
+
+.icon-text-button {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+}

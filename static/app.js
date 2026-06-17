@@ -6,6 +6,8 @@ let searchQuery = '';
 let selectedRelease = null;
 let currentPage = 1;
 const itemsPerPage = 12;
+let sortOrder = 'desc'; // 'desc' = Newest, 'asc' = Oldest
+let dateRange = 'all';  // 'all', '7', '30', '90'
 
 // Progress Ring Configuration
 const ringRadius = 9;
@@ -26,6 +28,8 @@ const resetFiltersBtn = document.getElementById('reset-filters-btn');
 const exportCsvBtn = document.getElementById('export-csv-btn');
 const paginationContainer = document.getElementById('pagination-container');
 const loadMoreBtn = document.getElementById('load-more-btn');
+const sortOrderBtn = document.getElementById('sort-order-btn');
+const dateRangeSelect = document.getElementById('date-range-select');
 
 // Modal Elements
 const tweetModal = document.getElementById('tweet-modal');
@@ -171,6 +175,39 @@ function setupEventListeners() {
             });
         }
     });
+
+    // Date Sorter Toggle
+    if (sortOrderBtn) {
+        sortOrderBtn.addEventListener('click', () => {
+            sortOrder = sortOrder === 'desc' ? 'asc' : 'desc';
+            
+            const iconAsc = sortOrderBtn.querySelector('.sort-icon-asc');
+            const iconDesc = sortOrderBtn.querySelector('.sort-icon-desc');
+            const label = document.getElementById('sort-order-label');
+            
+            if (sortOrder === 'asc') {
+                iconAsc.style.display = 'block';
+                iconDesc.style.display = 'none';
+                label.textContent = 'Oldest First';
+                showToast('Sorting: Oldest First', 'success');
+            } else {
+                iconAsc.style.display = 'none';
+                iconDesc.style.display = 'block';
+                label.textContent = 'Newest First';
+                showToast('Sorting: Newest First', 'success');
+            }
+            
+            applyFilters();
+        });
+    }
+
+    // Date Range Selection Dropdown
+    if (dateRangeSelect) {
+        dateRangeSelect.addEventListener('change', (e) => {
+            dateRange = e.target.value;
+            applyFilters();
+        });
+    }
 }
 
 // Reset all search and category filters
@@ -183,6 +220,20 @@ function resetFilters() {
     categoryFilters.querySelector('[data-category="all"]').classList.add('active');
     
     currentCategory = 'all';
+    
+    // Reset advanced filters
+    sortOrder = 'desc';
+    if (sortOrderBtn) {
+        sortOrderBtn.querySelector('.sort-icon-asc').style.display = 'none';
+        sortOrderBtn.querySelector('.sort-icon-desc').style.display = 'block';
+        document.getElementById('sort-order-label').textContent = 'Newest First';
+    }
+    
+    dateRange = 'all';
+    if (dateRangeSelect) {
+        dateRangeSelect.value = 'all';
+    }
+    
     applyFilters();
 }
 
@@ -259,6 +310,15 @@ function matchCategory(releaseType, category) {
     return false;
 }
 
+// Date Range matching helper
+function isWithinDateRange(updatedRaw, days) {
+    if (days === 'all') return true;
+    const releaseDate = new Date(updatedRaw);
+    const today = new Date();
+    const cutoffDate = new Date(today.setDate(today.getDate() - parseInt(days)));
+    return releaseDate >= cutoffDate;
+}
+
 // Apply current filters & search queries to state
 function applyFilters() {
     currentPage = 1; // Reset to page 1 on filter change
@@ -271,7 +331,16 @@ function applyFilters() {
             r.text.toLowerCase().includes(searchQuery) ||
             r.html.toLowerCase().includes(searchQuery);
             
-        return matchesCategory && matchesSearch;
+        const matchesDateRange = isWithinDateRange(r.updated_raw, dateRange);
+            
+        return matchesCategory && matchesSearch && matchesDateRange;
+    });
+
+    // Apply sorting
+    filteredReleases.sort((a, b) => {
+        const dateA = new Date(a.updated_raw);
+        const dateB = new Date(b.updated_raw);
+        return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
     });
 
     renderReleases();

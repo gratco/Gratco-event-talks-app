@@ -87,13 +87,40 @@
             
             <!-- Controls: Search & Categories -->
             <div class="header-controls">
-                <div class="search-container">
-                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    <input type="text" id="search-input" placeholder="Search release notes by keywords, tags..." aria-label="Search release notes">
-                    <button id="clear-search-btn" class="clear-btn" aria-label="Clear search" style="display: none;">&times;</button>
+                <div class="controls-top-row">
+                    <div class="search-container">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="search-input" placeholder="Search release notes by keywords, tags..." aria-label="Search release notes">
+                        <button id="clear-search-btn" class="clear-btn" aria-label="Clear search" style="display: none;">&times;</button>
+                    </div>
+                    
+                    <div class="advanced-filters">
+                        <!-- Date Sorter Toggle -->
+                        <button id="sort-order-btn" class="secondary-button icon-text-button" title="Toggle sorting order">
+                            <svg class="btn-icon sort-icon-asc" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <polyline points="19 12 12 19 5 12"></polyline>
+                            </svg>
+                            <svg class="btn-icon sort-icon-desc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="19" x2="12" y2="5"></line>
+                                <polyline points="5 12 12 5 19 12"></polyline>
+                            </svg>
+                            <span id="sort-order-label">Newest First</span>
+                        </button>
+                        
+                        <!-- Date Range Selection Dropdown -->
+                        <div class="select-container">
+                            <select id="date-range-select" aria-label="Filter by date range">
+                                <option value="all">All Time</option>
+                                <option value="7">Past 7 Days</option>
+                                <option value="30">Past 30 Days</option>
+                                <option value="90">Past 90 Days</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="filters-container">

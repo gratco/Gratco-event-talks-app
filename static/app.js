@@ -21,6 +21,7 @@ const statusBanner = document.getElementById('status-banner');
 const statusMessage = document.getElementById('status-message');
 const emptyState = document.getElementById('empty-state');
 const resetFiltersBtn = document.getElementById('reset-filters-btn');
+const exportCsvBtn = document.getElementById('export-csv-btn');
 
 // Modal Elements
 const tweetModal = document.getElementById('tweet-modal');
@@ -87,6 +88,11 @@ function setupEventListeners() {
 
     // Refresh button
     refreshBtn.addEventListener('click', () => fetchReleases(true));
+
+    // Export CSV button
+    if (exportCsvBtn) {
+        exportCsvBtn.addEventListener('click', exportToCSV);
+    }
 
     // Search inputs
     searchInput.addEventListener('input', (e) => {
@@ -319,16 +325,61 @@ function renderReleases() {
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                     </svg>
                 </a>
-                <button class="tweet-action-btn" data-id="${r.id}">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                    </svg>
-                    <span>Tweet</span>
-                </button>
+                <div class="card-actions">
+                    <button class="copy-action-btn" data-id="${r.id}" title="Copy release notes to clipboard">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span>Copy</span>
+                    </button>
+                    <button class="tweet-action-btn" data-id="${r.id}">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                        <span>Tweet</span>
+                    </button>
+                </div>
             </div>
         `;
         
         releasesGrid.appendChild(card);
+    });
+
+    // Attach click events to Copy buttons
+    releasesGrid.querySelectorAll('.copy-action-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const releaseId = e.currentTarget.dataset.id;
+            const item = releases.find(r => r.id === releaseId);
+            if (item) {
+                try {
+                    await navigator.clipboard.writeText(item.text);
+                    showToast('Release content copied!', 'success');
+                    
+                    // Button feedback
+                    const targetBtn = e.currentTarget;
+                    const originalText = targetBtn.querySelector('span').textContent;
+                    const originalIconHTML = targetBtn.querySelector('svg').outerHTML;
+                    
+                    targetBtn.querySelector('span').textContent = 'Copied!';
+                    targetBtn.innerHTML = `
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 6L9 17l-5-5"/>
+                        </svg>
+                        <span>Copied!</span>
+                    `;
+                    targetBtn.classList.add('success-state');
+                    
+                    setTimeout(() => {
+                        targetBtn.innerHTML = `${originalIconHTML}<span>${originalText}</span>`;
+                        targetBtn.classList.remove('success-state');
+                    }, 2000);
+                    
+                } catch (err) {
+                    showToast('Failed to copy content.', 'error');
+                }
+            }
+        });
     });
 
     // Attach click events to Tweet buttons
@@ -490,4 +541,61 @@ function showToast(message, type = 'success') {
     setTimeout(() => {
         toast.remove();
     }, 3000);
+}
+
+// Export current filtered release notes to a CSV file
+function exportToCSV() {
+    if (filteredReleases.length === 0) {
+        showToast('No releases to export.', 'error');
+        return;
+    }
+
+    // Helper to escape values for CSV
+    const escapeCSV = (val) => {
+        if (val === null || val === undefined) return '';
+        let formatted = val.toString();
+        // Replace carriage returns and newlines with spaces
+        formatted = formatted.replace(/[\r\n]+/g, ' ');
+        // If it contains double quotes, commas, or semicolons, wrap it in double quotes and double any existing quotes
+        if (formatted.includes('"') || formatted.includes(',') || formatted.includes(';')) {
+            formatted = '"' + formatted.replace(/"/g, '""') + '"';
+        }
+        return formatted;
+    };
+
+    // Header row
+    const headers = ['ID', 'Date', 'Type', 'URL', 'Content'];
+    const rows = [headers];
+
+    // Data rows
+    filteredReleases.forEach(r => {
+        rows.push([
+            r.id,
+            r.date,
+            r.type,
+            r.link,
+            r.text
+        ]);
+    });
+
+    // Convert to CSV string
+    const csvContent = rows.map(e => e.map(escapeCSV).join(',')).join('\n');
+
+    // Create Blob and trigger download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    // Format file name with current category and date
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const categoryName = currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `BigQuery_Releases_${categoryName}_${dateStr}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showToast(`Successfully exported ${filteredReleases.length} releases!`, 'success');
 }

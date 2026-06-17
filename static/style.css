@@ -1259,3 +1259,30 @@ textarea:focus:not(:focus-visible) {
     outline: none;
     box-shadow: none;
 }
+
+/* Pagination Styling */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.pagination-container .primary-button.secondary-action {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    box-shadow: none;
+    padding: 0.8rem 2rem;
+    border-radius: 14px;
+    font-weight: 700;
+    transition: all var(--transition-fast);
+}
+
+.pagination-container .primary-button.secondary-action:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.2);
+}

@@ -4,6 +4,8 @@ let filteredReleases = [];
 let currentCategory = 'all';
 let searchQuery = '';
 let selectedRelease = null;
+let currentPage = 1;
+const itemsPerPage = 12;
 
 // Progress Ring Configuration
 const ringRadius = 9;
@@ -22,6 +24,8 @@ const statusMessage = document.getElementById('status-message');
 const emptyState = document.getElementById('empty-state');
 const resetFiltersBtn = document.getElementById('reset-filters-btn');
 const exportCsvBtn = document.getElementById('export-csv-btn');
+const paginationContainer = document.getElementById('pagination-container');
+const loadMoreBtn = document.getElementById('load-more-btn');
 
 // Modal Elements
 const tweetModal = document.getElementById('tweet-modal');
@@ -146,6 +150,14 @@ function setupEventListeners() {
     // Tweet actions
     copyTweetBtn.addEventListener('click', copyTweetToClipboard);
     postTweetBtn.addEventListener('click', postTweetToTwitter);
+
+    // Load More button
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', () => {
+            currentPage++;
+            renderReleases();
+        });
+    }
 }
 
 // Reset all search and category filters
@@ -236,6 +248,7 @@ function matchCategory(releaseType, category) {
 
 // Apply current filters & search queries to state
 function applyFilters() {
+    currentPage = 1; // Reset to page 1 on filter change
     filteredReleases = releases.filter(r => {
         const matchesCategory = matchCategory(r.type, currentCategory);
         
@@ -303,12 +316,16 @@ function renderReleases() {
     
     if (filteredReleases.length === 0) {
         emptyState.style.display = 'block';
+        if (paginationContainer) paginationContainer.style.display = 'none';
         return;
     }
     
     emptyState.style.display = 'none';
     
-    filteredReleases.forEach(r => {
+    const visibleCount = currentPage * itemsPerPage;
+    const visibleReleases = filteredReleases.slice(0, visibleCount);
+    
+    visibleReleases.forEach(r => {
         const card = document.createElement('div');
         const themeClass = getThemeClass(r.type);
         card.className = `card ${themeClass}`;
@@ -349,6 +366,15 @@ function renderReleases() {
         
         releasesGrid.appendChild(card);
     });
+
+    // Toggle Load More button visibility
+    if (paginationContainer) {
+        if (visibleCount < filteredReleases.length) {
+            paginationContainer.style.display = 'flex';
+        } else {
+            paginationContainer.style.display = 'none';
+        }
+    }
 
     // Attach click events to Copy buttons
     releasesGrid.querySelectorAll('.copy-action-btn').forEach(btn => {

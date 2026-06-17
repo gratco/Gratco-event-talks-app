@@ -1238,3 +1238,24 @@ body {
     margin-top: auto;
     padding-top: 3rem;
 }
+
+/* Accessibility & Keyboard Focus Styles */
+a:focus-visible,
+input:focus-visible,
+button:focus-visible,
+textarea:focus-visible,
+.chip:focus-visible,
+.switch input:focus-visible + .slider {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.25);
+}
+
+/* Clear default focus outlines when clicked with mouse (browser default fallback) */
+a:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+button:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+}

@@ -1311,3 +1311,55 @@ textarea:focus:not(:focus-visible) {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.2);
 }
+
+/* Hashtag Selector inside Composer */
+.hashtag-selector-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.selector-label {
+    color: var(--text-secondary);
+    font-weight: 700;
+}
+
+.hashtag-checkboxes {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.tag-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--border-color);
+    border: 1px solid transparent;
+    padding: 0.25rem 0.65rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+    user-select: none;
+}
+
+.tag-checkbox input {
+    cursor: pointer;
+    accent-color: var(--color-primary);
+}
+
+.tag-checkbox:hover {
+    background: var(--border-hover);
+    color: var(--text-primary);
+}
+
+.tag-checkbox:has(input:checked) {
+    background: var(--color-accent-bg);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}

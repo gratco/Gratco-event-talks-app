@@ -158,6 +158,19 @@ function setupEventListeners() {
             renderReleases();
         });
     }
+
+    // Hashtag checkboxes click events to update tweet content in real time
+    ['tag-bq', 'tag-gc', 'tag-gcp'].forEach(id => {
+        const cb = document.getElementById(id);
+        if (cb) {
+            cb.addEventListener('change', () => {
+                if (selectedRelease) {
+                    tweetTextarea.value = generateTweetText(selectedRelease);
+                    updateTweetLength();
+                }
+            });
+        }
+    });
 }
 
 // Reset all search and category filters
@@ -448,6 +461,12 @@ function openTweetModal(release) {
     previewUpdateDate.textContent = release.date;
     previewUpdateText.textContent = release.text;
     
+    // Reset hashtag checkboxes to default checked state
+    ['tag-bq', 'tag-gc', 'tag-gcp'].forEach(id => {
+        const cb = document.getElementById(id);
+        if (cb) cb.checked = true;
+    });
+    
     // Draft tweet contents
     const textSnippet = generateTweetText(release);
     tweetTextarea.value = textSnippet;
@@ -463,9 +482,18 @@ function closeTweetModal() {
     selectedRelease = null;
 }
 
+// Get current active hashtags based on checkbox options
+function getActiveHashtags() {
+    const tags = [];
+    if (document.getElementById('tag-bq')?.checked) tags.push('#BigQuery');
+    if (document.getElementById('tag-gc')?.checked) tags.push('#GoogleCloud');
+    if (document.getElementById('tag-gcp')?.checked) tags.push('#GCP');
+    return tags.join(' ');
+}
+
 // Smart Tweet generator fitting within limits
 function generateTweetText(release) {
-    const hashTags = "#BigQuery #GoogleCloud #GCP";
+    const hashTags = getActiveHashtags();
     const header = `BigQuery Update - ${release.date} [${release.type}]:`;
     const link = release.link;
     
@@ -482,7 +510,8 @@ function generateTweetText(release) {
         snippet = snippet.substring(0, maxSnippetLength).trim() + "...";
     }
     
-    return `${header}\n"${snippet}"\n\n${link}\n${hashTags}`;
+    const formattedTags = hashTags ? `\n${hashTags}` : '';
+    return `${header}\n"${snippet}"\n\n${link}${formattedTags}`;
 }
 
 // Update character limits and visual indicators

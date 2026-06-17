@@ -16,7 +16,7 @@ const clearSearchBtn = document.getElementById('clear-search-btn');
 const categoryFilters = document.getElementById('category-filters');
 const refreshBtn = document.getElementById('refresh-btn');
 const refreshSpinner = document.getElementById('refresh-spinner');
-const themeToggleBtn = document.getElementById('theme-toggle-btn');
+const themeSwitchCheckbox = document.getElementById('theme-switch-checkbox');
 const statusBanner = document.getElementById('status-banner');
 const statusMessage = document.getElementById('status-message');
 const emptyState = document.getElementById('empty-state');
@@ -53,14 +53,16 @@ function setupTheme() {
     if (savedTheme === 'light') {
         document.body.classList.remove('dark-theme');
         document.body.classList.add('light-theme');
+        if (themeSwitchCheckbox) themeSwitchCheckbox.checked = true;
     } else {
         document.body.classList.remove('light-theme');
         document.body.classList.add('dark-theme');
+        if (themeSwitchCheckbox) themeSwitchCheckbox.checked = false;
     }
 }
 
-function toggleTheme() {
-    if (document.body.classList.contains('dark-theme')) {
+function handleThemeChange(e) {
+    if (e.target.checked) {
         document.body.classList.remove('dark-theme');
         document.body.classList.add('light-theme');
         localStorage.setItem('theme', 'light');
@@ -83,8 +85,10 @@ function setupProgressRing() {
 
 // Event Listeners
 function setupEventListeners() {
-    // Theme Toggle
-    themeToggleBtn.addEventListener('click', toggleTheme);
+    // Theme Switch Slider
+    if (themeSwitchCheckbox) {
+        themeSwitchCheckbox.addEventListener('change', handleThemeChange);
+    }
 
     // Refresh button
     refreshBtn.addEventListener('click', () => fetchReleases(true));

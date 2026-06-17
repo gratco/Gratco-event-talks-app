@@ -429,11 +429,87 @@ body {
     height: 18px;
 }
 
-/* Sun/Moon Toggle states */
-.dark-theme .sun-icon { display: block; }
-.dark-theme .moon-icon { display: none; }
-.light-theme .sun-icon { display: none; }
-.light-theme .moon-icon { display: block; }
+/* Custom Theme Switch Slider */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 0.4rem 0.75rem;
+    border-radius: 9999px;
+    height: 44px;
+    transition: background-color var(--transition-normal), border var(--transition-normal);
+}
+
+.switch-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted);
+    transition: color var(--transition-fast);
+}
+
+/* Light up active icon based on body class */
+.dark-theme .moon-icon-small {
+    color: var(--color-primary);
+    filter: drop-shadow(0 0 4px rgba(79, 172, 254, 0.4));
+}
+
+.light-theme .sun-icon-small {
+    color: var(--color-primary);
+    filter: drop-shadow(0 0 4px rgba(79, 172, 254, 0.4));
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 22px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border-color);
+    transition: background-color var(--transition-normal);
+    border-radius: 34px;
+    border: 1px solid var(--border-color);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--text-primary);
+    transition: transform var(--transition-normal);
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Checked state: slider turns primary color */
+.switch input:checked + .slider {
+    background-color: var(--color-accent-bg);
+    border-color: var(--color-primary);
+}
+
+/* Knob moves to the right */
+.switch input:checked + .slider:before {
+    transform: translateX(20px);
+    background-color: var(--color-primary);
+}
 
 /* Status Banner */
 .status-banner {
